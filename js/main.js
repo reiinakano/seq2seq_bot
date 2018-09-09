@@ -11,16 +11,45 @@ class Main {
    */
   constructor() {
     // Initiate variables
-    this.generatedSentence = document.getElementById("generated-sentence");
-    this.inputSeed = document.getElementById("seed");
-    this.generateButton = document.getElementById("generate-button");
-    this.generateButton.onclick = () => {
-      this.generateText();
+    this.generatedChat = document.getElementById("generated-chat");
+    this.inputText = document.getElementById("input-text");
+    this.chatButton = document.getElementById("chat-button");
+    this.chatButton.onclick = () => {
+      this.sendChat();
     }
-    tf.loadModel('lstm/model.json').then((model) => {
-      this.model = model;
-      this.enableGeneration();
-    });
+    /*
+    tf.loadModel('encoder-model/model.json').then(encoder => {
+        this.encoder = encoder;
+        this.enableGeneration();
+    });*/
+    Promise.all([
+        tf.loadModel('decoder-model/model.json'),
+        tf.loadModel('encoder-model/model.json')
+    ]).then(([decoder, encoder]) => {
+        this.decoder = decoder;
+        this.encoder = encoder;
+        this.enableGeneration();
+    })
+  }
+
+  /**
+   * Called after model has finished loading or generating. 
+   * Sets up UI elements for generating text.
+   */
+  enableGeneration() {
+    this.chatButton.innerText = "Send";
+    this.chatButton.disabled = false;
+  }
+
+  sendChat() {
+    const result = tf.tidy(() => {
+        const input = tf.tensor2d([0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 348,20, 9, 120], [1, 18])
+        const states = this.encoder.predict(input);
+        this.decoder.layers[1].resetStates(states);
+        return this.decoder.predict(tf.zeros([1, 1, 801]));
+    })
+
+    result.print();
   }
 
 }

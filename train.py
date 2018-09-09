@@ -19,7 +19,7 @@ import re
 np.random.seed(42)
 
 BATCH_SIZE = 64
-NUM_EPOCHS = 50
+NUM_EPOCHS = 2
 HIDDEN_UNITS = 256
 MAX_INPUT_SEQ_LENGTH = 18
 MAX_TARGET_SEQ_LENGTH = 18
@@ -174,10 +174,10 @@ model.fit_generator(generator=train_gen, steps_per_epoch=train_num_batches,
 encoder_model = Model(encoder_inputs, encoder_states)
 encoder_model.save('model/encoder-weights.h5')
 
-new_decoder_inputs = Input(batch_shape=(1, None, num_decoder_tokens), name='decoder_inputs')
-new_decoder_lstm = LSTM(units=HIDDEN_UNITS, return_state=True, return_sequences=True, name='decoder_lstm', stateful=True)
+new_decoder_inputs = Input(batch_shape=(1, None, num_decoder_tokens), name='new_decoder_inputs')
+new_decoder_lstm = LSTM(units=HIDDEN_UNITS, return_state=True, return_sequences=True, name='new_decoder_lstm', stateful=True)
 new_decoder_outputs, _, _ = new_decoder_lstm(new_decoder_inputs)
-new_decoder_dense = Dense(units=num_decoder_tokens, activation='softmax', name='decoder_dense')
+new_decoder_dense = Dense(units=num_decoder_tokens, activation='softmax', name='new_decoder_dense')
 new_decoder_outputs = new_decoder_dense(new_decoder_outputs)
 new_decoder_lstm.set_weights(decoder_lstm.get_weights())
 new_decoder_dense.set_weights(decoder_dense.get_weights())
