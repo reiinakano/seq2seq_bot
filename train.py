@@ -25,15 +25,13 @@ def store_js(filename, data):
 np.random.seed(42)
 
 BATCH_SIZE = 64
-NUM_EPOCHS = 2
+NUM_EPOCHS = 50
 HIDDEN_UNITS = 256
 MAX_INPUT_SEQ_LENGTH = 18
 MAX_TARGET_SEQ_LENGTH = 18
 MAX_VOCAB_SIZE = 800
 DATA_PATH = 'data/bot_data.tsv'
 WEIGHT_FILE_PATH = 'model/word-weights.h5'
-
-
 
 input_counter = Counter()
 target_counter = Counter()
