@@ -16,12 +16,13 @@ class Main {
    */
   constructor() {
     // Initiate variables
-    this.generatedChat = document.getElementById("generated-chat");
+    this.chatTextBox = document.getElementById("generated-chat");
     this.inputText = document.getElementById("input-text");
     this.chatButton = document.getElementById("chat-button");
     this.chatButton.onclick = () => {
       this.sendChat();
     }
+    this.chatContent = [];
     
     Promise.all([
         tf.loadModel('decoder-model/model.json'),
@@ -31,7 +32,6 @@ class Main {
         this.encoder = encoder;
         this.enableGeneration();
     })
-    this.convertSentenceToTensor("give me a joKe");
   }
 
   /**
@@ -44,7 +44,10 @@ class Main {
   }
 
   async sendChat() {
+    this.chatButton.disabled = true;
     let inputText = this.inputText.value;
+    this.inputText.value = '';
+    this.updateChatbox('USER', inputText);
 
     const states = tf.tidy(() => {
         const input = this.convertSentenceToTensor(inputText);
@@ -78,16 +81,15 @@ class Main {
         if (word === '<EOS>' || numPredicted >= wordContext.decoder_max_seq_length) {
             terminate = true;
         }
+
+        await tf.nextFrame();
     }
 
-    const result = tf.tidy(() => {
-        const input = this.convertSentenceToTensor(inputText);
-        const states = this.encoder.predict(input);
-        this.decoder.layers[1].resetStates(states);
-        return this.decoder.predict(tf.zeros([1, 1, 801]));
-    })
+    this.updateChatbox('BOT', this.convertTokensToSentence(responseTokens));
 
-    result.print();
+    states[0].dispose();
+    states[1].dispose();
+    this.chatButton.disabled = false;
   }
 
   generateDecoderInputFromTokenID(tokenID) {
@@ -117,6 +119,22 @@ class Main {
     }
     console.log(input_wids);
     return tf.tensor2d(input_wids, [1, 18]);
+  }
+
+  convertTokensToSentence(tokens) {
+      return tokens.join(' ');
+  }
+
+  updateChatbox(user, text) {
+      this.chatContent.push({user, text});
+
+      let textBoxString = '';
+      for (let i = 0; i < this.chatContent.length; i++) {
+          textBoxString += this.chatContent[i].user + ': ' + this.chatContent[i].text + '\n\n';
+      }
+
+      this.chatTextBox.innerText = textBoxString;
+      console.log(this.chatContent);
   }
 
 }
