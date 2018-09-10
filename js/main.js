@@ -18,6 +18,12 @@ class Main {
     // Initiate variables
     this.chatTextBox = document.getElementById('generated-chat');
     this.inputText = document.getElementById('input-text');
+    this.inputText.onkeyup = (evt) => {
+        evt.preventDefault();
+        if (evt.keyCode === 13) {
+            this.sendChat();
+        } 
+    }
     this.chatButton = document.getElementById('chat-button');
     this.chatButton.onclick = () => {
       this.sendChat();
