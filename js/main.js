@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import 'babel-polyfill';
+import word_tokenize from './tokenizer';
 
 /**
  * Main application to start on window load
@@ -18,10 +19,6 @@ class Main {
       this.sendChat();
     }
     /*
-    tf.loadModel('encoder-model/model.json').then(encoder => {
-        this.encoder = encoder;
-        this.enableGeneration();
-    });*/
     Promise.all([
         tf.loadModel('decoder-model/model.json'),
         tf.loadModel('encoder-model/model.json')
@@ -29,7 +26,8 @@ class Main {
         this.decoder = decoder;
         this.encoder = encoder;
         this.enableGeneration();
-    })
+    })*/
+    this.convert('Seven sheiks, sda\'s, forever! Man\'s beast "sss"');
   }
 
   /**
@@ -50,6 +48,10 @@ class Main {
     })
 
     result.print();
+  }
+
+  convert(sentence) {
+    console.log(word_tokenize(sentence));
   }
 
 }

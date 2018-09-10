@@ -15,6 +15,12 @@ import nltk
 import numpy as np
 import pandas as pd
 import re
+import json
+
+
+def store_js(filename, data):
+    with open(filename, 'w') as f:
+        f.write('export default ' + json.dumps(data, indent=2))
 
 np.random.seed(42)
 
@@ -86,6 +92,12 @@ np.save('model/word-input-idx2word.npy', input_idx2word)
 np.save('model/word-target-word2idx.npy', target_word2idx)
 np.save('model/word-target-idx2word.npy', target_idx2word)
 
+# Store necessary mappings for tfjs
+store_js('js/mappings/input-word2idx.js', input_word2idx)
+store_js('js/mappings/input-idx2word.js', input_idx2word)
+store_js('js/mappings/target-word2idx.js', target_word2idx)
+store_js('js/mappings/target-idx2word.js', target_idx2word)
+
 encoder_input_data = []
 
 encoder_max_seq_length = 0
@@ -111,7 +123,7 @@ context['decoder_max_seq_length'] = decoder_max_seq_length
 
 print(context)
 np.save('model/word-context.npy', context)
-
+store_js('js/mappings/word-context.js', context)
 
 def generate_batch(input_data, output_text_data):
     num_batches = len(input_data) // BATCH_SIZE
